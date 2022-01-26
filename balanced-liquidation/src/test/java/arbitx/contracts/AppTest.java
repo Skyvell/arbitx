@@ -29,7 +29,7 @@ class balancedStrategiesTest extends TestBase {
 
     @BeforeEach
     public void setup() throws Exception {
-        arbitx = sm.deploy(owner, LiquidationStrategy.class, "test");
+        arbitx = sm.deploy(owner, BalancedLiquidation.class, "test");
         System.out.println("HEJ");
         System.out.flush();
     }

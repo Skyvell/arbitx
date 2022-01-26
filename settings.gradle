@@ -1,3 +1,3 @@
 rootProject.name = 'arbitx'
 include (
-    'balanced-liquidation-strategy')
+    'balanced-liquidation')

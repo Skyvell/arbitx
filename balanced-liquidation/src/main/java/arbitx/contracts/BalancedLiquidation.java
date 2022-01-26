@@ -15,7 +15,7 @@ import java.util.Map;
 import scorex.util.ArrayList;
 
 
-public class LiquidationStrategy {
+public class BalancedLiquidation {
 
     // Contract name.
     private final String name;
@@ -27,7 +27,7 @@ public class LiquidationStrategy {
     private final VarDB<Address> dex = Context.newVarDB("dex", Address.class);
     private final VarDB<Address> loan = Context.newVarDB("loan", Address.class);
 
-    public LiquidationStrategy(String name) {
+    public BalancedLiquidation(String name) {
         this.name = name;
         this.loan.set(Address.fromString("cxae0fe2b1b4c3c224510b7168a2dd927791558493"));
     }
