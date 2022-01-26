@@ -4,7 +4,4 @@
 build
 out
 bin
-keystore.json
-deploy_to_local.sh
-deploy.sh
-arbitx.json
+deployments
