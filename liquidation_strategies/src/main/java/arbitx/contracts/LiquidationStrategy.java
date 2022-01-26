@@ -7,14 +7,15 @@ import score.annotation.External;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import scorex.util.ArrayList;
 
 
-public class Arbitx {
+public class LiquidationStrategy {
 
     // Contract name.
     private final String name;
@@ -26,9 +27,9 @@ public class Arbitx {
     private final VarDB<Address> dex = Context.newVarDB("dex", Address.class);
     private final VarDB<Address> loan = Context.newVarDB("loan", Address.class);
 
-
-    public Arbitx(String name) {
+    public LiquidationStrategy(String name) {
         this.name = name;
+        this.loan.set(Address.fromString("cxae0fe2b1b4c3c224510b7168a2dd927791558493"));
     }
 
     @External(readonly = true)
@@ -92,21 +93,27 @@ public class Arbitx {
     }
 
     @External
-    public void liquidateUsers(List<Address> users) {
-        for(int i = 0; i < users.size(); i++) {
-            Context.call(this.loan.get(), "liquidate", users.get(i));
+    public void operateOnUsers(Address[] users) {
+        for(int i = 0; i < users.length; i++) {
+            Context.call(this.loan.get(), "liquidate", users[i]);
         }
+
+        try {
         buyCollateralAtDiscount();    
+        }
+        catch(Exception e) {
+            return;
+        }
     }
 
     @External(readonly = true)
     public List<Address> getLiquidableUsers () {
-        Integer borrowerCount = (int) Context.call(this.loan.get(), "borrowerCount");  
-        List<Address> liquidableUsers = new ArrayList<Address>();
+        BigInteger borrowerCount = (BigInteger) Context.call(this.loan.get(), "borrowerCount");  
+        ArrayList<Address> liquidableUsers = new ArrayList<Address>();
         Address userAddress;
         String userStanding;
 
-        for(int i=1; i <= borrowerCount; i++) {
+        for(BigInteger i = BigInteger.ONE; i.compareTo(borrowerCount) <= 0; i=i.add(BigInteger.ONE)) {
             userAddress = (Address) Context.call(this.loan.get(), "getPositionAddress", i);
             userStanding = getUserStanding(userAddress);
             
@@ -114,7 +121,7 @@ public class Arbitx {
                 liquidableUsers.add(userAddress);
             }  
         }
-        return liquidableUsers;   
+        return liquidableUsers;
     }
 
     @External
@@ -131,43 +138,29 @@ public class Arbitx {
             bnusdBalance = getTokenBalance(bnusd);
 
             try {
-                Context.call(loan, "retireBadDebt", "bnusd", bnusdBalance);
+                Context.call(loan, "retireBadDebt", "bnUSD", bnusdBalance);
             }
             catch(Exception e){
                 break;
             }
 
             sicxBalance = getTokenBalance(sicx);
+            Context.call(this.rebalancing.get(), "rebalance");
             transferToken(sicx, dex, sicxBalance, createSwapData(bnusd));
         }   
     }
 
-    private String getUserStanding(Address user) {
-        String userData = (String) Context.call(this.loan.get(), "getAccountPosition", user);
-        JsonObject json = Json.parse(userData).asObject();
-        String standing = json.get("standing").asString();
+    @External(readonly = true)
+    public String getUserStanding(Address user) {
+        Map<String, Object> userData = (Map<String, Object>) Context.call(this.loan.get(), "getAccountPositions", user);
+        String standing = userData.get("standing").toString();
         return standing;
     }
 
-
-
-
-
-
-    //private Integer getBalancedLiquidationRatio() {
-    //    String parameters = (String) Context.call(this.loan.get(), "getParameters");
-    //    JsonObject json = Json.parse(parameters).asObject();
-    //    Integer liquidationRatio = json.get("liquidation ratio").asInt();
-    //    return liquidationRatio;
-    //}
-
-    //private static BigInteger pow10(int exponent) {
-    //    BigInteger result = BigInteger.ONE;
-    //    for (int i = 0; i < exponent; i++) {
-    //        result = result.multiply(BigInteger.TEN);
-    //    }
-    //    return result;
-    //}
+    @External(readonly = true)
+    public BigInteger getBorrowerCount() {
+        return (BigInteger) Context.call(this.loan.get(), "borrowerCount");
+    }
 
     @External
     public void tokenFallback (Address from, BigInteger value, byte[] data) {
