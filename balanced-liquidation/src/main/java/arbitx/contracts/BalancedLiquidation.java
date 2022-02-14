@@ -17,10 +17,8 @@ import scorex.util.ArrayList;
 
 public class BalancedLiquidation {
 
-    // Contract name.
     private final String name;
 
-    // Balanced contract addresses.
     private final VarDB<Address> sicx = Context.newVarDB("sICX", Address.class);
     private final VarDB<Address> bnusd = Context.newVarDB("bnUSD", Address.class);
     private final VarDB<Address> rebalancing = Context.newVarDB("rebalancing", Address.class);
