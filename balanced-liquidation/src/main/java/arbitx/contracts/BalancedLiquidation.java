@@ -16,8 +16,9 @@ import scorex.util.ArrayList;
 
 
 public class BalancedLiquidation {
-
     private final String name;
+
+    private final VarDB<Address> operator = Context.newVarDB("sICX", Address.class);
 
     private final VarDB<Address> sicx = Context.newVarDB("sICX", Address.class);
     private final VarDB<Address> bnusd = Context.newVarDB("bnUSD", Address.class);
@@ -27,7 +28,13 @@ public class BalancedLiquidation {
 
     public BalancedLiquidation(String name) {
         this.name = name;
-        this.loan.set(Address.fromString("cxae0fe2b1b4c3c224510b7168a2dd927791558493"));
+        this.loan.set(Address.fromString("cx66d4d90f5f113eba575bf793570135f9b10cece1"));
+        this.dex.set(Address.fromString("cxa0af3165c08318e988cb30993b3048335b94af6c"));
+        this.rebalancing.set(Address.fromString("cx40d59439571299bca40362db2a7d8cae5b0b30b0"));
+        this.operator.set(Address.fromString("hx40f44f65b0a84dc1a608518ae585d3863b34d6a2")); 
+        this.bnusd.set(Address.fromString("cx88fd7df7ddff82f7cc735c871dc519838cb235bb"));
+        this.sicx.set(Address.fromString("cx2609b924e33ef00b648a409245c7ea394c467824"));
+        
     }
 
     @External(readonly = true)
@@ -37,7 +44,7 @@ public class BalancedLiquidation {
 
     @External
     public void setSicx (Address address) {
-        Context.require(Context.getCaller() == Context.getOwner());
+        Context.require(Context.getCaller() == this.operator.get());
         this.sicx.set(address);
     }
 
@@ -48,7 +55,7 @@ public class BalancedLiquidation {
 
     @External 
     public void setbnUSD (Address address) {
-        Context.require(Context.getCaller() == Context.getOwner());
+        Context.require(Context.getCaller() == this.operator.get());
         this.bnusd.set(address);
     }
 
@@ -59,7 +66,7 @@ public class BalancedLiquidation {
 
     @External
     public void setRebalancing (Address address) {
-        Context.require(Context.getCaller() == Context.getOwner());
+        Context.require(Context.getCaller() == this.operator.get());
         this.rebalancing.set(address);
     }
 
@@ -70,7 +77,7 @@ public class BalancedLiquidation {
 
     @External
     public void setDex (Address address) {
-        Context.require(Context.getCaller() == Context.getOwner());
+        Context.require(Context.getCaller() == this.operator.get());
         this.dex.set(address);
     }
 
@@ -81,7 +88,7 @@ public class BalancedLiquidation {
 
     @External
     public void setLoan (Address address) {
-        Context.require(Context.getCaller() == Context.getOwner());
+        Context.require(Context.getCaller() == this.operator.get());
         this.loan.set(address);
     }
 
@@ -97,7 +104,7 @@ public class BalancedLiquidation {
         }
 
         try {
-        buyCollateralAtDiscount();    
+            buyCollateralAtDiscount();    
         }
         catch(Exception e) {
             return;
@@ -131,6 +138,9 @@ public class BalancedLiquidation {
 
         BigInteger bnusdBalance;
         BigInteger sicxBalance;
+
+        sicxBalance = getTokenBalance(sicx);
+        transferToken(sicx, dex, sicxBalance, createSwapData(bnusd));
         
         while(true) {
             bnusdBalance = getTokenBalance(bnusd);

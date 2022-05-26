@@ -29,7 +29,7 @@ class CrossdexArbitrageTest extends TestBase {
 
     @BeforeEach
     public void setup() throws Exception {
-        arbitx = sm.deploy(owner, CrossdexArbitrage.class, "test");
+        arbitx = sm.deploy(owner, TradeExecutor.class, "test");
         System.out.println("HEJ");
         System.out.flush();
     }

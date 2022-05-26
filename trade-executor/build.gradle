@@ -12,7 +12,7 @@ dependencies {
 }
 
 optimizedJar {
-    mainClassName = 'arbitx.contracts.CrossdexArbitrage'
+    mainClassName = 'arbitx.contracts.TradeExecutor'
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }

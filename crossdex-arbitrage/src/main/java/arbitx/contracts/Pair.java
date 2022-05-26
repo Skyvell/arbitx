@@ -1,32 +1,60 @@
 package arbitx.contracts;
 
 import score.Address;
+import score.ObjectReader;
+import score.ObjectWriter;
 
-import java.util.List;
-
-import com.iconloop.score.util.EnumerableIntMap;
-import com.iconloop.score.util.EnumerableSet;
+import java.math.BigInteger;
 
 
 public class Pair {
-    String name;
-    Address baseCurrency;
-    Address quoteCurrency;
-    List<Address> listedOn;
+    public String name;
+    public Address tokenA;
+    public Address tokenB;
+    public BigInteger convexusFee;
+    public BigInteger arbitrageThreshold;
+    public BigInteger tokensPerIteration;
 
-    public Pair(String name, Address baseCurrency, Address quoteCurrency, List<Address> listedOn) {
+    public Pair() {
+    }
+
+    public Pair(String name, Address tokenA, Address tokenB, BigInteger convexusFee, BigInteger arbitrageThreshold, BigInteger tokensPerIteration) {
         this.name = name;
-        this.baseCurrency = baseCurrency;
-        this.quoteCurrency = quoteCurrency;
-        this.listedOn = listedOn;
+        this.tokenA = tokenA;
+        this.tokenB = tokenB;
+        this.convexusFee = convexusFee;
+        this.arbitrageThreshold = arbitrageThreshold;
+        this.tokensPerIteration = tokensPerIteration;
     }
 
-    public void getLiquidityPoolDataBalanced() {
-        // Get LP data from balanced.
+    public void evaluateArbitrage() {
+        //Convexus.getPrice();
+        //Balanced.getPrice();
+        //return evaluation;
     }
 
-    public void getLiquidityPoolDataEquality() {
-        // Get LP data from equality.
+    public static void writeObject(ObjectWriter w, Pair p) {
+        w.beginList(6);
+        w.write(p.name);
+        w.write(p.tokenA);
+        w.write(p.tokenB);
+        w.write(p.convexusFee);
+        w.write(p.arbitrageThreshold);
+        w.write(p.tokensPerIteration);
+        w.end();
     }
 
+    public static Pair readObject(ObjectReader r) {
+        r.beginList();
+        Pair p = new Pair(
+            r.readString(),
+            r.readAddress(),
+            r.readAddress(),
+            r.readBigInteger(),
+            r.readBigInteger(),
+            r.readBigInteger());
+        r.end();
+        return p;
+    }
 }
+
