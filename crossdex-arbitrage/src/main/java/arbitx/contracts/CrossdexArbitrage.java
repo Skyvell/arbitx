@@ -141,8 +141,20 @@ public class CrossdexArbitrage {
             }
             iterations++;
 
-            if (iterations > 4) {
-                break;
+            // Break if exceeding max-iterations.
+            // Update tokensPerIteration outside range (10% increase or decrease). 
+            ArbitrageIterations iterationRange = this.getArbitrageIterations();
+            if (iterations > iterationRange.maxIterations.intValue()) {
+                this.removePair(pair.name);
+                BigInteger tokenIncrease = pair.tokensPerIteration.divide(BigInteger.TEN);
+                BigInteger newTokensPerIteration = pair.tokensPerIteration.add(tokenIncrease);
+                this.addPair(pair.name, pair.tokenA, pair.tokenB, pair.convexusFee, pair.arbitrageThreshold, newTokensPerIteration);
+
+            else if(iterations < iterationRange.minIterations.intValue()) {
+                this.removePair(pair.name);
+                BigInteger tokenDecrease = pair.tokensPerIteration.divide(BigInteger.TEN);
+                BigInteger newTokensPerIteration = pair.tokensPerIteration.subtract(tokenDecrease);
+                this.addPair(pair.name, pair.tokenA, pair.tokenB, pair.convexusFee, pair.arbitrageThreshold, newTokensPerIteration);
             }
         }
 
