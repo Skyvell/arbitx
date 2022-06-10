@@ -145,18 +145,6 @@ public class CrossdexArbitrage {
 
     }
 
-    @External(readonly = true)
-    public BigInteger balancedPrice(String name) {
-        Pair pair = this.pairs.get(name);
-        return getBalancedPrice(pair);
-    }
-
-    @External(readonly = true)
-    public BigInteger convexusPrice(String name) {
-        Pair pair = this.pairs.get(name);
-        return getConvexusPrice(pair);
-    }
-
     @External
     public void tokenFallback (Address from, BigInteger value, byte[] data) {
         return;
