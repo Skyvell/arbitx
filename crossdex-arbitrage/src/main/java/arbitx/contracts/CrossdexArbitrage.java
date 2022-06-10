@@ -149,6 +149,7 @@ public class CrossdexArbitrage {
                 BigInteger tokenIncrease = pair.tokensPerIteration.divide(BigInteger.TEN);
                 BigInteger newTokensPerIteration = pair.tokensPerIteration.add(tokenIncrease);
                 this.addPair(pair.name, pair.tokenA, pair.tokenB, pair.convexusFee, pair.arbitrageThreshold, newTokensPerIteration);
+            }
 
             else if(iterations < iterationRange.minIterations.intValue()) {
                 this.removePair(pair.name);
