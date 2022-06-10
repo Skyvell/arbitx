@@ -1,3 +1,4 @@
-# Artitx
+# Arbitx
 
-Strategies to make money in Icon ecosystem.
+- Balanced <-> convexus homogenous pool arbitrage.
+- Balanced liquidation.
