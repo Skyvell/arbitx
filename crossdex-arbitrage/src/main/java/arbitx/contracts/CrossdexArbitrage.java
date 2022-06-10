@@ -5,6 +5,7 @@ import score.VarDB;
 import score.Address;
 import score.annotation.EventLog;
 import score.annotation.External;
+
 import scorex.util.ArrayList;
 
 import java.math.BigInteger;
@@ -25,14 +26,15 @@ public class CrossdexArbitrage {
     public CrossdexArbitrage(String name) {
         this.name = name;
         this.balancedDex.set(Address.fromString("cx648a6d9c5f231f6b86c0caa9cc9eff8bd6040999"));
+        this.arbitrageExecutor.set(Address.fromString("cx7d625c19e786cab96a872f777b30696acbb71068"));
         this.convexusPoolFactory.set(Address.fromString("cx4d21f894d5c2f1f172e5b6aed171dd650d3165f6"));
         this.addPair(
             "sicx/bnusd", 
             Address.fromString("cx70806fdfa274fe12ab61f1f98c5a7a1409a0c108"), 
             Address.fromString("cx5838cb516d6156a060f90e9a3de92381331ff024"), 
             BigInteger.valueOf(3000), 
-            BigInteger.valueOf(1000), 
-            BigInteger.valueOf(10000));
+            BigInteger.valueOf(100),
+            BigInteger.valueOf(2).multiply(Constants.EXA));
     }
     
     @External(readonly = true)
@@ -114,8 +116,8 @@ public class CrossdexArbitrage {
                         "executeArbitrage",
                         eval.buyExchange, 
                         eval.sellExchange, 
-                        pair.tokenB,
                         pair.tokenA,
+                        pair.tokenB,
                         pair.convexusFee, 
                         pair.tokensPerIteration)
                     );
@@ -124,9 +126,13 @@ public class CrossdexArbitrage {
                 break;
             }
             iterations++;
+
+            if (iterations > 4) {
+                break;
+            }
         }
 
-        ArbitrageReport(pair.tokenA, profit, BigInteger.valueOf(iterations));
+        ArbitrageReport(pair.name, profit, BigInteger.valueOf(iterations));
 
 
         // Report result?
@@ -156,15 +162,9 @@ public class CrossdexArbitrage {
         return;
     }
 
-    @External(readonly = true)
-    public BigInteger getTokenBalance(Address token) {
-        return (BigInteger) Context.call(token, "balanceOf", Context.getAddress());
-    }
-
 
     // ===========================  Helper functions   ==========================================
 
-   
    
     @SuppressWarnings("unchecked")
     private BigInteger getBalancedPrice(Pair pair) {
@@ -204,15 +204,10 @@ public class CrossdexArbitrage {
         return eval;
     }
 
-    private void transferToken(Address token, Address to, BigInteger amount, byte[] data) {
-        Context.call(token, "transfer", to, amount, data);
-    }
-
-
 
     // ==============================   Eventlogs   =================================================
 
 
     @EventLog(indexed=3)
-    protected void ArbitrageReport(Address token, BigInteger profit, BigInteger iterations) {}
+    protected void ArbitrageReport(String pairName, BigInteger profit, BigInteger iterations) {}
 }

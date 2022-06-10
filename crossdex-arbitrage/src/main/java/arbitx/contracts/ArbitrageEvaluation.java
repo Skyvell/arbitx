@@ -43,14 +43,16 @@ public class ArbitrageEvaluation {
         }
     }
 
+
+    // I changed around balanced and convexus. Thinking is wrong with quote/base.
     private void assignSellAndBuyExchanges() {
         if (this.convexusPrice.compareTo(this.balancedPrice) < 0) {
-            this.buyExchange = "convexus";
-            this.sellExchange = "balanced";
-        }
-        else {
             this.buyExchange = "balanced";
             this.sellExchange = "convexus";
+        }
+        else {
+            this.buyExchange = "convexus";
+            this.sellExchange = "balanced";
         }
     }
 }

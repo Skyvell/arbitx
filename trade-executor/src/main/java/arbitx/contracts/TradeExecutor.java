@@ -31,6 +31,7 @@ public class TradeExecutor {
     public TradeExecutor(String name) {
         this.name = name;
         this.balancedDex.set(Address.fromString("cx648a6d9c5f231f6b86c0caa9cc9eff8bd6040999"));
+        this.arbitrageSettings.set(Address.fromString("cxefc2d219b6bfb0ad645dfe8b0eddf3d0f674cb95"));
         this.convexusSwapRouter.set(Address.fromString("cx1e6129d4ff4fc5e58daae80966cbb4b1a4f8ea7c"));
     }
 
