@@ -20,6 +20,9 @@ public class CrossdexArbitrage {
     private final VarDB<Address> balancedDex = Context.newVarDB("balancedDex", Address.class);
     private final VarDB<Address> convexusPoolFactory = Context.newVarDB("convexusPoolFactory", Address.class);
     private final VarDB<Address> arbitrageExecutor = Context.newVarDB("ArbitrageExecutor", Address.class);
+
+    private final VarDB<ArbitrageIterations> arbitrageIterations = Context.newVarDB("arbitrageIterations", ArbitrageIterations.class);
+
     
     private final EnumerableMap<String, Pair> pairs = new EnumerableMap<String, Pair>("pairs", String.class, Pair.class);
 
@@ -40,6 +43,17 @@ public class CrossdexArbitrage {
     @External(readonly = true)
     public String name() {
         return name;
+    }
+
+    @External
+    public void setArbitrageIterations(BigInteger minIterations, BigInteger maxIterations) {
+        ArbitrageIterations iterations = new ArbitrageIterations(minIterations, maxIterations);
+        this.arbitrageIterations.set(iterations);
+    }
+
+    @External
+    public ArbitrageIterations getArbitrageIterations() {
+        return this.arbitrageIterations.get();
     }
 
     // Token A quoted in token B.
