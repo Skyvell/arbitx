@@ -1,4 +1,4 @@
 # Arbitx
 
-- Balanced <-> convexus homogenous pool arbitrage.
-- Balanced liquidation.
+- Balanced <-> convexus homogenous pool arbitrage smart contract.
+- Balanced liquidation smart contract.
